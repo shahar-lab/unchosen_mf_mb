@@ -6,7 +6,9 @@ simulate_artifical_data <-function(path,cfg){
 
   #set sample size
   Nsubjects =dim(model_parameters$artificial_individual_parameters)[1] 
-
+  # for (subject in 1:Nsubjects) {
+  #   df=rbind(df, sim.block(subject=subject, parameters=model_parameters$artificial_individual_parameters[subject,],cfg=cfg))
+  # }
   #run simulation
 
   n.cores <- parallel::detectCores() - 1

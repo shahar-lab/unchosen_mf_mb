@@ -14,7 +14,6 @@ simulate_convert_to_standata <-function (path,cfg,var_toinclude){
                                  block_column         = df$block,
                                  var_toinclude        = var_toinclude,
                                  additional_arguments = list(
-                                   Narms  = cfg$Narms, 
                                    Nraffle= cfg$Nraffle))
 
   #save

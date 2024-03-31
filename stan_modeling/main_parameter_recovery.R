@@ -5,18 +5,19 @@ source('./functions/my_starter.R')
 path = set_workingmodel()
 
 cfg = list(
-  Nsubjects        = 5,
-  Nblocks          = 2,
+  Nsubjects        = 100,
+  Nblocks          = 4,
   Ntrials_perblock = 50,
-  Narms            = 2, #number of arms in the task
-  Nraffle          = 2, #number of arms offered for selection each trial
-  rndwlk           = read.csv('./functions/rndwlk.csv', header = F)
+  Npersons         = 5, #number of arms in the task
+  Nobjects         = 5, #number of arms offered for selection each trial
+  Nraffle          = 2,
+  rndwlk           = read.csv('./functions/randomwalk_5_arms_200_trials.csv', header = F)
 )
 
 
 #####Simulate data--------------------
 generate_artificial_data(cfg = cfg)
-
+load(paste0(path$data,'/artificial_data.Rdata'))
 #####sample posterior--------------------
 
 modelfit_compile(path, format = F)

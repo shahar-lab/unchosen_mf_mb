@@ -16,11 +16,15 @@ generate_artificial_data <- function(cfg) {
                                var_toinclude  = c(
                                  'first_trial_in_block',
                                  'trial',
-                                 'offer1',
-                                 'offer2',
-                                 'choice',
-                                 'unchosen',
-                                 'reward',
+                                 'person1',
+                                 'person2',
+                                 'ch_person',
+                                 'unch_person',
+                                 'common_object',
+                                 'unique_ch_object',
+                                 'unique_unch_object',
+                                 'common_reward',
+                                 'unique_reward',
                                  'selected_offer',
                                  'fold')
   )
