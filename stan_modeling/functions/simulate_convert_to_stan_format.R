@@ -14,7 +14,10 @@ simulate_convert_to_standata <-function (path,cfg,var_toinclude){
                                  block_column         = df$block,
                                  var_toinclude        = var_toinclude,
                                  additional_arguments = list(
-                                   Nraffle= cfg$Nraffle))
+                                   Nraffle= cfg$Nraffle,
+                                   Npersons= cfg$Npersons,
+                                   Nobjects= cfg$Nobjects
+                                   ))
 
   #save
   save(data_for_stan,file=paste0('data/stan_ready_data_files/artificial_standata_', path$name, '.Rdata'))

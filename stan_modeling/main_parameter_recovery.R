@@ -20,7 +20,7 @@ generate_artificial_data(cfg = cfg)
 load(paste0(path$data,'/artificial_data.Rdata'))
 #####sample posterior--------------------
 
-modelfit_compile(path, format = F)
+modelfit_compile(path, format = T)
 
 modelfit_mcmc(
   path,
@@ -28,16 +28,18 @@ modelfit_mcmc(
   
   mymcmc = list(
     datatype = 'artificial' ,
-    samples  = 100,
-    warmup  = 200,
+    samples  = 1000,
+    warmup  = 2000,
     chains  = 4,
     cores   = 4
   )
 )
 
 #####examine results--------------------
-mypars = c("population_scales[1]",
-           "population_scales[2]")
+mypars = c("population_locations[1]",
+           "population_locations[2]",
+           "population_locations[3]",
+           "population_locations[4]")
 
 examine_mcmc(path, mypars, datatype = 'artificial')
 
