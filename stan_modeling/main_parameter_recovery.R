@@ -6,7 +6,7 @@ path = set_workingmodel()
 
 cfg = list(
   Nsubjects        = 100,
-  Nblocks          = 4,
+  Nblocks          = 8,
   Ntrials_perblock = 50,
   Npersons         = 5, #number of arms in the task
   Nobjects         = 5, #number of arms offered for selection each trial
@@ -43,9 +43,9 @@ mypars = c("population_locations[1]",
 
 examine_mcmc(path, mypars, datatype = 'artificial')
 
-examine_population_parameters_recovery(path, datatype = 'artificial')
+examine_population_parameters_recovery(path, datatype = 'artificial',ncolumns = 3)
 
-examine_individual_parameters_recovery(path)
+examine_individual_parameters_recovery(path,ncolumns=2)
 
 
 ####examine model

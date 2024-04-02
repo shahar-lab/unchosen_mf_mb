@@ -10,5 +10,5 @@
 model_parameters=list()
 model_parameters$names                             =c('alpha_mf',"alpha_mf_unch","alpha_mb","omega",'beta')
 model_parameters$transformation                    =c('logit','logit','logit','logit','none')
-model_parameters$artificial_population_location    =c(qlogis(0.3),qlogis(0.3),qlogis(0.3),qlogis(0.3),4)
+model_parameters$artificial_population_location    =c(qlogis(0.3),qlogis(0.3),qlogis(0.5),qlogis(0.3),4)
 model_parameters$artificial_population_scale       =c(1,1,1,1,1.5)

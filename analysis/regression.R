@@ -1,5 +1,6 @@
 
 rm(list=ls())
+source('./functions/my_starter.R')
 #load any of the four models 
 path = set_workingmodel()
 load(paste0(path$data,"/artificial_data.Rdata"))
@@ -23,61 +24,174 @@ df=df%>%mutate(reoffer_ch_person=(lag(ch_person)==person1)|(lag(ch_person)==pers
 #All models will show these effects
 #MF
 df%>%filter(reoffer_ch_person==T)%>%group_by(previous_total_reward)%>%summarise(mean(stay_person))
-mf=glmer(stay_person~previous_total_reward+(previous_total_reward|subject),data=df%>%filter(reoffer_ch_person==T),family=binomial(link="logit"))
-summary(mf)
 
+myprior=prior(normal(0,1),class=b)
+mf_b =
+  brm(
+    formula=stay_person~0+previous_total_reward+(previous_total_reward|subject),
+    data = df%>%filter(reoffer_ch_person==T),
+    family = bernoulli(link = "logit"),
+    warmup = 1000,
+    iter = 2000,
+    chains = 4,
+    cores = 4,
+    seed = 123,
+    backend = "cmdstanr"
+  )
+save(mf_b,file=paste0(path$data,'/regression/model_free.Rdata'))
+conditional_effects(mf_b)
 #modulation by alpha_mf and omega
-mf_modulation=glmer(stay_person~previous_total_reward*omega+previous_total_reward*alpha_mf+(previous_total_reward|subject),data=df%>%filter(reoffer_ch_person==T),family=binomial(link="logit"))
-summary(mf_modulation)
-plot(effects::effect("previous_total_reward:alpha_mf",mf_modulation))
-plot(effects::effect("previous_total_reward:omega",mf_modulation))
+myprior=prior(normal(0,1),class=b)
+mf_modulation_b =
+  brm(
+    formula=stay_person~0+previous_total_reward*omega+previous_total_reward*alpha_mf+(previous_total_reward|subject),
+    data = df%>%filter(reoffer_ch_person==T),
+    family = bernoulli(link = "logit"),
+    warmup = 1000,
+    iter = 2000,
+    chains = 4,
+    cores = 4,
+    seed = 123,
+    backend = "cmdstanr"
+  )
+save(mf_modulation_b,file=paste0(path$data,'/regression/model_free_modulation.Rdata'))
+conditional_effects(mf_modulation_b)
 
 #MB
 #common_MB (the combined model won't show an effect here, because the )
 df%>%filter(reoffer_ch_person==F,reoffer_common_object==T)%>%group_by(previous_common_reward)%>%summarise(mean(stay_common_object))
-mb_common=glmer(stay_common_object~previous_common_reward+(previous_common_reward|subject),data=df%>%filter(reoffer_ch_person==F,reoffer_common_object==T),family=binomial(link="logit"))
-summary(mb_common)
 
+myprior=prior(normal(0,1),class=b)
+mb_common_b =
+  brm(
+    formula=stay_common_object~0+previous_common_reward+(previous_common_reward|subject),
+    data = df%>%filter(reoffer_ch_person==F,reoffer_common_object==T),
+    family = bernoulli(link = "logit"),
+    warmup = 1000,
+    iter = 2000,
+    chains = 4,
+    cores = 4,
+    seed = 123,
+    backend = "cmdstanr"
+  )
+save(mb_common_b,file=paste0(path$data,'/regression/model_based_common.Rdata'))
+conditional_effects(mb_common_b)
 #unique_mb
 df%>%filter(reoffer_ch_person==F,reoffer_unch_person==F,reoffer_unique_ch_object==T)%>%group_by(previous_unique_reward)%>%summarise(mean(stay_unique_object))
-mb_unique=glmer(stay_unique_object~previous_unique_reward+(previous_unique_reward|subject),data=df%>%filter(reoffer_ch_person==F,reoffer_unique_ch_object==T),family=binomial(link="logit"))
-summary(mb_unique)
 
+mb_unique_b =
+  brm(
+    formula=stay_unique_object~0+previous_unique_reward+(previous_unique_reward|subject),
+    data = df%>%filter(reoffer_ch_person==F,reoffer_unique_ch_object==T),
+    family = bernoulli(link = "logit"),
+    warmup = 1000,
+    iter = 2000,
+    chains = 4,
+    cores = 4,
+    seed = 123,
+    backend = "cmdstanr"
+  )
+save(mb_unique_b,file=paste0(path$data,'/regression/model_based_unique.Rdata'))
+conditional_effects(mb_unique_b)
 #modulation by alpha_mb and omega
-mb_common_modulation=glmer(stay_common_object~previous_common_reward*alpha_mb+previous_common_reward*omega+(previous_common_reward|subject),data=df%>%filter(reoffer_ch_person==F,reoffer_common_object==T),family=binomial(link="logit"))
-summary(mb_common_modulation)
-plot(effects::effect("previous_common_reward:alpha_mb",mb_common_modulation))
-plot(effects::effect("previous_common_reward:omega",mb_common_modulation))
+mb_common_modulation_b =
+  brm(
+    formula=stay_common_object~0+previous_common_reward*omega+previous_common_reward*alpha_mb+(previous_common_reward|subject),
+    data = df%>%filter(reoffer_ch_person==F,reoffer_common_object==T),
+    family = bernoulli(link = "logit"),
+    warmup = 1000,
+    iter = 2000,
+    chains = 4,
+    cores = 4,
+    seed = 123,
+    backend = "cmdstanr"
+  )
+save(mb_common_modulation_b,file=paste0(path$data,'/regression/model_based_common_modulation.Rdata'))
+conditional_effects(mb_common_modulation_b)
 
-mb_unique_modulation=glmer(stay_unique_object~previous_unique_reward*alpha_mb+previous_unique_reward*omega+(previous_unique_reward|subject),data=df%>%filter(reoffer_ch_person==F,reoffer_unique_ch_object==T),family=binomial(link="logit"))
-summary(mb_unique_modulation)
-plot(effects::effect("previous_unique_reward:alpha_mb",mb_unique_modulation))
-plot(effects::effect("previous_unique_reward:omega",mb_unique_modulation))
-
+mb_unique_modulation_b =
+  brm(
+    formula=stay_unique_object~0+previous_unique_reward*omega+previous_unique_reward*alpha_mb+(previous_unique_reward|subject),
+    data = df%>%filter(reoffer_ch_person==F,reoffer_unique_ch_object==T),
+    family = bernoulli(link = "logit"),
+    warmup = 1000,
+    iter = 2000,
+    chains = 4,
+    cores = 4,
+    seed = 123,
+    backend = "cmdstanr"
+  )
+save(mb_unique_modulation_b,file=paste0(path$data,'/regression/model_based_unique_modulation.Rdata'))
+conditional_effects(mb_unique_modulation_b)
 # MF_unch -----------------------------------------------------------------
 
 df%>%filter(reoffer_unch_person==T,reoffer_ch_person==F)%>%group_by(previous_unique_reward)%>%summarise(mean(ch_prev_unchosen))
-mf_unch=glmer(ch_prev_unchosen~previous_unique_reward+(previous_unique_reward|subject),data=df%>%filter(reoffer_unch_person==T,reoffer_ch_person==F),family=binomial(link="logit"))
-summary(mf_unch)
+
+mf_unch_b =
+  brm(
+    formula=ch_prev_unchosen~previous_unique_reward+(previous_unique_reward|subject),
+    data = df%>%filter(reoffer_unch_person==T,reoffer_ch_person==F),
+    family = bernoulli(link = "logit"),
+    warmup = 1000,
+    iter = 2000,
+    chains = 4,
+    cores = 4,
+    seed = 123,
+    backend = "cmdstanr"
+  )
+save(mf_unch_b,file=paste0(path$data,'/regression/model_free_unch.Rdata'))
+conditional_effects(mf_unch_b)
 
 #modulation by alpha_mf_unch
-mf_unch_modulation=glmer(ch_prev_unchosen~previous_unique_reward*alpha_mf_unch+(previous_unique_reward|subject),data=df%>%filter(reoffer_unch_person==T,reoffer_ch_person==F),family=binomial(link="logit"))
-summary(mf_unch_modulation)
-plot(effects::effect("previous_unique_reward:alpha_mf_unch",mf_unch_modulation))
-
+mf_unch_modulation_b =
+  brm(
+    formula=ch_prev_unchosen~previous_unique_reward*alpha_mf_unch+(previous_unique_reward|subject),
+    data = df%>%filter(reoffer_unch_person==T,reoffer_ch_person==F),
+    family = bernoulli(link = "logit"),
+    warmup = 1000,
+    iter = 2000,
+    chains = 4,
+    cores = 4,
+    seed = 123,
+    backend = "cmdstanr"
+  )
+save(mf_unch_modulation_b,file=paste0(path$data,'/regression/model_free_unch_modulation.Rdata'))
+conditional_effects(mf_unch_modulation_b)
 
 # MB_unch -----------------------------------------------------------------
 
 df%>%filter(reoffer_unch_person==F,reoffer_ch_person==F,reoffer_unique_unch_object==T)%>%group_by(previous_unique_reward)%>%summarise(mean(ch_prev_unch_unique_object))
-mb_unch=glmer(ch_prev_unch_unique_object~previous_unique_reward+(previous_unique_reward|subject),data=df%>%filter(reoffer_unch_person==F,reoffer_ch_person==F,reoffer_unique_unch_object==T,reoffer_unique_ch_object==F),family=binomial(link="logit"))
-summary(mb_unch)
+
+mb_unch_b =
+  brm(
+    formula=ch_prev_unch_unique_object~previous_unique_reward+(previous_unique_reward|subject),
+    data = df%>%filter(reoffer_unch_person==F,reoffer_ch_person==F,reoffer_unique_unch_object==T),
+    family = bernoulli(link = "logit"),
+    warmup = 1000,
+    iter = 2000,
+    chains = 4,
+    cores = 4,
+    seed = 123,
+    backend = "cmdstanr"
+  )
+save(mb_unch_b,file=paste0(path$data,'/regression/model_based_unch.Rdata'))
+conditional_effects(mb_unch_b)
 
 #modulation by alpha_mb_unch
-mb_unch_modulation=glmer(ch_prev_unch_unique_object~previous_unique_reward*alpha_mb_unch+(previous_unique_reward|subject),data=df%>%filter(reoffer_unch_person==F,reoffer_ch_person==F,reoffer_unique_unch_object==T,reoffer_unique_ch_object==F),family=binomial(link="logit"))
-summary(mb_unch_modulation)
-plot(effects::effect("previous_unique_reward:alpha_mb_unch",mb_unch_modulation))
-
-
+mb_unch_modulation_b =
+  brm(
+    formula=ch_prev_unch_unique_object~previous_unique_reward*alpha_mb_unch+(previous_unique_reward|subject),
+    data = df%>%filter(reoffer_unch_person==F,reoffer_ch_person==F,reoffer_unique_unch_object==T),
+    family = bernoulli(link = "logit"),
+    warmup = 1000,
+    iter = 2000,
+    chains = 4,
+    cores = 4,
+    seed = 123,
+    backend = "cmdstanr"
+  )
+save(mb_unch_modulation_b,file=paste0(path$data,'/regression/model_based_unch_modulation.Rdata'))
+conditional_effects(mb_unch_modulation_b)
 
 
 
