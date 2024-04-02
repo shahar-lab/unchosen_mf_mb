@@ -1,6 +1,5 @@
 misc/
 .RData
-!functions/working_model.rdata
 # History files
 .Rhistory
 .Rapp.history
