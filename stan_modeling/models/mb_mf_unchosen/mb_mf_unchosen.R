@@ -14,13 +14,17 @@ sim.block = function(subject,parameters,cfg){
 
   
   #set initial var
+  Nsubjects          = cfg$Nsubjects
   Npersons           = cfg$Npersons
   Nobjects           = cfg$Nobjects
   Nraffle            = cfg$Nraffle
   Nblocks            = cfg$Nblocks
   Ntrials_perblock   = cfg$Ntrials_perblock
-  expvalues          = cfg$rndwlk
-  rownames(expvalues)=c('ev1','ev2','ev3','ev4','ev5')
+  expvalues1          = cfg$rndwlk1
+  expvalues2          = cfg$rndwlk2
+  expvalues3          = cfg$rndwlk3
+  expvalues4          = cfg$rndwlk4
+  # rownames(expvalues)=c('ev1','ev2','ev3','ev4','ev5')
   df                 =data.frame()
   
   person_objects = matrix(c(1, 2,   # P1 has O1 and O2
@@ -31,7 +35,24 @@ sim.block = function(subject,parameters,cfg){
                           nrow = 5, byrow = TRUE)
   rownames(person_objects) = c("P1", "P2", "P3", "P4", "P5")
 for (block in 1:Nblocks){
-  
+  if(subject<=(Nsubjects/2)){
+    if(block==1){
+      expvalues=expvalues1
+    }
+    else{
+      expvalues=expvalues2
+    }
+  }
+  else{
+    if(block==1){
+      expvalues=expvalues3
+    }
+    else{
+      expvalues=expvalues4
+    }
+  }
+  #each subject gets their own order.
+  expvalues = expvalues[sample(nrow(expvalues)), ]
   Qmf      = as.matrix(t(rep(1,Npersons)))
   Qmb      = as.matrix(t(rep(0.5,Nobjects)))
   colnames(Qmf)     =sapply(1:Npersons, function(n) {paste('Qperson',n,sep="")})

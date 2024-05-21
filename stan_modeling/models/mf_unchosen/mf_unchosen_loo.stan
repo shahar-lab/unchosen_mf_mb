@@ -1,131 +1,416 @@
 data {
-  
+
   //General fixed parameters for the experiment/models
-  int<lower = 1> Nsubjects;                                         
-  int<lower = 1> Nblocks;           
-  int<lower = 1> Ntrials;                                           
-  int<lower = 1> Ntrials_per_subject[Nsubjects];                    
-  int<lower = 4> Narms;                                             
-  int<lower = 2> Nraffle; 
-  int<lower = 0> fold[Nsubjects,Ntrials];
+
+  
+
+  int<lower=1> Nsubjects;
+
+  
+
+  int<lower=1> Nblocks;
+
+  
+
+  int<lower=1> Ntrials;
+
+  
+
+  array[Nsubjects] int<lower=1> Ntrials_per_subject;
+
+  
+
+  int<lower=4> Npersons;
+
+  
+
+  int<lower=2> Nobjects;
+
+  
+
+  int<lower=2> Nraffle;
+  array[Nsubjects,Ntrials] int<lower = 0> fold;
   real testfold;
   
+
   //Behavioral data:
-  int<lower = 0> choice[Nsubjects,Ntrials];              
-  int<lower = 0> reward[Nsubjects,Ntrials];              
-  int<lower = 0> offer1[Nsubjects,Ntrials];              
-  int<lower = 0> offer2[Nsubjects,Ntrials];              
-  int<lower = 0> selected_offer[Nsubjects,Ntrials];      
-  int<lower = 0> first_trial_in_block[Nsubjects,Ntrials];
 
   
+
+  array[Nsubjects, Ntrials] int<lower=0> ch_person;
+
+  array[Nsubjects, Ntrials] int<lower=0> unch_person;
+
+  
+
+  array[Nsubjects, Ntrials] int<lower=0> common_object;
+
+  array[Nsubjects, Ntrials] int<lower=0> unique_ch_object;
+
+  array[Nsubjects, Ntrials] int<lower=0> unique_unch_object;
+
+  
+
+  array[Nsubjects, Ntrials] int<lower=0> common_reward;
+
+  array[Nsubjects, Ntrials] int<lower=0> unique_reward;
+
+  
+
+  array[Nsubjects, Ntrials] int<lower=0> person1;
+
+  
+
+  array[Nsubjects, Ntrials] int<lower=0> person2;
+
+  
+
+  array[Nsubjects, Ntrials] int<lower=0> selected_offer;
+
+  
+
+  array[Nsubjects, Ntrials] int<lower=0> first_trial_in_block;
+
 }
 
+transformed data {
 
-transformed data{
-  int<lower = 1> Nparameters=2; 
-  vector[Narms] Qvalue_initial; 
-  Qvalue_initial = rep_vector(0, Narms);
+  int<lower=1> Nparameters = 5;
+
 }
-
-
-
 
 parameters {
+
   //population level parameters 
-  vector         [Nparameters] population_locations;      
-  vector<lower=0>[Nparameters] population_scales;         
+
   
+
+  vector[Nparameters] population_locations;
+
+  
+
+  vector<lower=0>[Nparameters] population_scales;
+
+  
+
   //individuals level
-  vector[Nsubjects] alpha_random_effect;
+
+  
+
+  vector[Nsubjects] alpha_mf_random_effect;
+
+  
+
+  vector[Nsubjects] alpha_mf_unch_random_effect;
+
+  
+
+  vector[Nsubjects] alpha_mb_random_effect;
+
+  
+
+  vector[Nsubjects] omega_random_effect;
+
+  
+
   vector[Nsubjects] beta_random_effect;
+
 }
 
-
-transformed parameters {
-  
-  vector<lower=0, upper=1>[Nsubjects] alpha;
-  vector                  [Nsubjects] beta;
-  matrix                  [Ntrials,Nsubjects] p_ch_action;
-  matrix                  [Ntrials,Nsubjects] Qdiff_external;
-  matrix                  [Ntrials,Nsubjects] Qval1_external;
-  matrix                  [Ntrials,Nsubjects] Qval2_external;
-  matrix                  [Ntrials,Nsubjects] Qval3_external;
-  matrix                  [Ntrials,Nsubjects] Qval4_external;
-  matrix                  [Ntrials,Nsubjects] PE_external;
-  
-  
   
   //RL
-  for (subject in 1:Nsubjects) {
-    //internal variabels
-    real   Qdiff;
-    real   PE;
-    real   Qval[Narms]; 
-    
-    //set indvidual parameters
-    alpha[subject]   = inv_logit(population_locations[1]  + population_scales[1] * alpha_random_effect[subject]);
-    beta[subject]    =          (population_locations[2]  + population_scales[2] * beta_random_effect [subject]);
-    
-    //likelihood estimation
-    for (trial in 1:Ntrials_per_subject[subject]){
-      if(fold[subject,trial]!=testfold){
-      
-      //reset Qvalues (first trial only)
-      if (first_trial_in_block[subject,trial] == 1) {
-        Qval = rep_array(0, Narms);
-      }
-      
-      //calculate probability for each action
-      Qdiff        = Qval[offer2[subject,trial]]- Qval[offer1[subject,trial]];
-      
-      p_ch_action[trial,subject] = inv_logit(beta[subject]*Qdiff);
-      
-      //update Qvalues
-      PE  = reward[subject,trial]  - Qval[choice[subject,trial]];
-      Qval[choice[subject,trial]] = Qval[choice[subject,trial]]+alpha[subject]*PE;
-      
-      #appened to external variabels
-      Qdiff_external[trial,subject] = Qdiff;
-      Qval1_external[trial,subject] = Qval[1];
-      Qval2_external[trial,subject] = Qval[2];
-      Qval3_external[trial,subject] = Qval[3];
-      Qval4_external[trial,subject] = Qval[4];
-      PE_external[trial,subject]    = PE;
-    }  
-      }
-    
-  }
+
+transformed parameters {
+
+
+  vector<lower=0, upper=1>[Nsubjects] alpha_mf;
+
   
+
+  vector<lower=0, upper=1>[Nsubjects] alpha_mf_unch;
+
+  
+
+  vector<lower=0, upper=1>[Nsubjects] alpha_mb;
+
+  
+
+  vector<lower=0, upper=1>[Nsubjects] omega;
+
+  
+
+  vector[Nsubjects] beta;
+
+  
+
+  vector[Nraffle] Qmb_offered;
+
+  
+
+  vector[Nraffle] Qnet;
+
+  
+
+  real PE_mf;
+
+  
+
+  real PE_mf_unch;
+
+  
+
+  real PE_mb_common;
+
+  
+
+  real PE_mb_unique;
+
+  
+
+  vector[Npersons] Qmf;
+
+  
+
+  vector[Nobjects] Qmb;
+
+  
+
+  matrix[Ntrials, Nsubjects] Qnet_diff;
+
+  
+
+
+  //RL
+
+  for (subject in 1 : Nsubjects) {
+
+    //internal variabels
+
+    
+
+    //set indvidual parameters
+
+    
+    alpha_mf[subject] = inv_logit(population_locations[1]
+
+                                  + population_scales[1]
+
+                                    * alpha_mf_random_effect[subject]);
+
+    
+
+    alpha_mf_unch[subject] = inv_logit(population_locations[2]
+
+                                       + population_scales[2]
+
+                                         * alpha_mf_unch_random_effect[subject]);
+
+    
+
+    alpha_mb[subject] = inv_logit(population_locations[3]
+
+                                  + population_scales[3]
+
+                                    * alpha_mb_random_effect[subject]);
+
+    
+
+    omega[subject] = inv_logit(population_locations[4]
+
+                               + population_scales[4]
+
+                                 * omega_random_effect[subject]);
+
+    
+
+    beta[subject] = (population_locations[5]
+
+                     + population_scales[5] * beta_random_effect[subject]);
+    
+
+    //likelihood estimation
+
+    for (trial in 1 : Ntrials_per_subject[subject]) {
+      if(fold[subject,trial]!=testfold){
+      //reset Qvalues (first trial only)
+
+      if (first_trial_in_block[subject, trial] == 1) {
+
+        Qmf = rep_vector(1, Npersons);
+
+        Qmb = rep_vector(0.5, Nobjects);
+
+      }
+
+      
+
+      //calculate probability for each action
+
+      if (ch_person[subject, trial] == person1[subject, trial]) {
+
+        Qmb_offered[1] = Qmb[common_object[subject, trial]]
+
+                         + Qmb[unique_ch_object[subject, trial]];
+
+        Qmb_offered[2] = Qmb[common_object[subject, trial]]
+
+                         + Qmb[unique_unch_object[subject, trial]];
+
+      } else {
+
+        Qmb_offered[1] = Qmb[common_object[subject, trial]]
+
+                         + Qmb[unique_unch_object[subject, trial]];
+
+        Qmb_offered[2] = Qmb[common_object[subject, trial]]
+
+                         + Qmb[unique_ch_object[subject, trial]];
+
+      }
+
+      Qnet[1] = (1 - omega[subject]) * Qmf[person1[subject, trial]]
+
+                + omega[subject] * Qmb_offered[1];
+
+      Qnet[2] = (1 - omega[subject]) * Qmf[person2[subject, trial]]
+
+                + omega[subject] * Qmb_offered[2];
+
+      Qnet_diff[trial, subject] = Qnet[2] - Qnet[1];
+
+      
+
+      //update Qvalues
+
+      PE_mf = common_reward[subject, trial] + unique_reward[subject, trial]
+
+              - Qmf[ch_person[subject, trial]];
+
+      
+
+      PE_mf_unch = (1 - common_reward[subject, trial])
+
+                   + (1 - unique_reward[subject, trial])
+
+                   - Qmf[unch_person[subject, trial]];
+
+      
+
+      Qmf[ch_person[subject, trial]] = Qmf[ch_person[subject, trial]]
+
+                                       + alpha_mf[subject] * PE_mf;
+
+      
+
+      Qmf[unch_person[subject, trial]] = Qmf[unch_person[subject, trial]]
+
+                                         + alpha_mf_unch[subject]
+
+                                           * PE_mf_unch;
+
+      
+
+      PE_mb_common = common_reward[subject, trial]
+
+                     - Qmb[common_object[subject, trial]];
+
+      
+
+      Qmb[common_object[subject, trial]] = Qmb[common_object[subject, trial]]
+
+                                           + alpha_mb[subject] * PE_mb_common;
+
+      
+
+      PE_mb_unique = unique_reward[subject, trial]
+
+                     - Qmb[unique_ch_object[subject, trial]];
+
+      
+
+      Qmb[unique_ch_object[subject, trial]] = Qmb[unique_ch_object[subject, trial]]
+
+                                              + alpha_mb[subject]
+
+                                                * PE_mb_unique;
+
+      
+      
 }
 
+    }
+
+  }
+
+}
 
 model {
-  
+
   // population level  
-  population_locations  ~ normal(0,2);            
-  population_scales     ~ cauchy(0,2);        
+
+  population_locations ~ normal(0, 2);
+
+  population_scales ~ normal(0, 2);
+
   
+
   // indvidual level  
-  alpha_random_effect ~ std_normal();
-  beta_random_effect  ~ std_normal();
+
   
+
+  alpha_mf_random_effect ~ std_normal();
+
   
-  for (subject in 1:Nsubjects){
-    for (trial in 1:Ntrials_per_subject[subject]){
-      if(fold[subject,trial]!=testfold){ //fit parameters only for training set
-      target+= bernoulli_logit_lpmf(selected_offer[subject,trial] | beta[subject] * Qdiff_external[trial,subject]);
-      }
-    }
-  }
+
+  alpha_mf_unch_random_effect ~ std_normal();
+
+  
+
+  alpha_mb_random_effect ~ std_normal();
+
+  
+
+  omega_random_effect ~ std_normal();
+
+  
+
+  beta_random_effect ~ std_normal();
+
+
+  
+
+  for (subject in 1 : Nsubjects) {
+
+    for (trial in 1 : Ntrials_per_subject[subject]) {
+if(fold[subject,trial]!=testfold &&first_trial_in_block[subject, trial] != 1){
+      target += bernoulli_logit_lpmf(selected_offer[subject, trial] | beta[subject]
+
+                                                                    * Qnet_diff[trial, subject]);
 }
+    }
+
+  }
+
+}
+
 
 generated quantities {
 
   matrix[Ntrials,Nsubjects]  log_lik;
-  vector[Narms] Qval;
-  vector[Nraffle] Qoffer;
-  real   PE;
+  vector[Nraffle] Qmb_offered_g;
+
+  vector[Nraffle] Qnet_g;
+  real PE_mf_g;
+  real PE_mf_unch_g;
+
+  real PE_mb_common_g;
+
+  real PE_mb_unique_g;
+  
+  vector[Npersons] Qmf_g;
+
+  vector[Nobjects] Qmb_g;
+  matrix[Ntrials, Nsubjects] Qnet_diff_g;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Likelihood function per subject per trial
 log_lik=rep_matrix(0,Ntrials,Nsubjects);
@@ -137,18 +422,91 @@ log_lik=rep_matrix(0,Ntrials,Nsubjects);
  
       //reset Qvalues (first trial only)
       if (first_trial_in_block[subject,trial] == 1) {
-        Qval =rep_vector(0, Narms);
+        Qmf_g = rep_vector(1, Npersons);
+
+        Qmb_g = rep_vector(0.5, Nobjects);
       }
-        //offer values
-          Qoffer[1]=Qval[offer1[subject,trial]];
-          Qoffer[2]=Qval[offer2[subject,trial]];
-        log_lik[trial,subject] = bernoulli_logit_lpmf(selected_offer[subject, trial] | beta[subject] * Qoffer);
+        if (ch_person[subject, trial] == person1[subject, trial]) {
+
+        Qmb_offered_g[1] = Qmb_g[common_object[subject, trial]]
+
+                         + Qmb_g[unique_ch_object[subject, trial]];
+
+        Qmb_offered_g[2] = Qmb_g[common_object[subject, trial]]
+
+                         + Qmb_g[unique_unch_object[subject, trial]];
+
+      } else {
+
+        Qmb_offered_g[1] = Qmb_g[common_object[subject, trial]]
+
+                         + Qmb_g[unique_unch_object[subject, trial]];
+
+        Qmb_offered_g[2] = Qmb_g[common_object[subject, trial]]
+
+                         + Qmb_g[unique_ch_object[subject, trial]];
+
+      }
+      
+      Qnet_g[1] = (1 - omega[subject]) * Qmf_g[person1[subject, trial]]
+
+                + omega[subject] * Qmb_offered_g[1];
+
+      Qnet_g[2] = (1 - omega[subject]) * Qmf_g[person2[subject, trial]]
+
+                + omega[subject] * Qmb_offered_g[2];
+
+      Qnet_diff_g[trial, subject] = Qnet_g[2] - Qnet_g[1];
+      if (first_trial_in_block[subject, trial] != 1){
+      log_lik[trial,subject] = bernoulli_logit_lpmf(selected_offer[subject, trial] | beta[subject] * Qnet_diff_g[trial, subject]);
+}
+      
+           //update Qvalues
+
+      PE_mf_g = common_reward[subject, trial] + unique_reward[subject, trial]
+
+              - Qmf_g[ch_person[subject, trial]];
+
+      Qmf_g[ch_person[subject, trial]] = Qmf_g[ch_person[subject, trial]]
+
+                                       + alpha_mf[subject] * PE_mf_g;
 
       
+      PE_mf_unch_g = (1 - common_reward[subject, trial])
+
+                   + (1 - unique_reward[subject, trial])
+
+                   - Qmf_g[unch_person[subject, trial]];
+
       
-      //update Qvalues
-      PE  = reward[subject,trial]  - Qval[choice[subject,trial]];
-      Qval[choice[subject,trial]] = Qval[choice[subject,trial]]+alpha[subject]*PE;
+
+      
+
+      Qmf_g[unch_person[subject, trial]] = Qmf_g[unch_person[subject, trial]]
+
+                                         + alpha_mf_unch[subject]
+
+                                           * PE_mf_unch_g;
+
+      PE_mb_common_g = common_reward[subject, trial]
+
+                     - Qmb_g[common_object[subject, trial]];
+
+      Qmb_g[common_object[subject, trial]] = Qmb_g[common_object[subject, trial]]
+
+                                           + alpha_mb[subject] * PE_mb_common_g;
+
+      
+
+      PE_mb_unique_g = unique_reward[subject, trial]
+
+                     - Qmb_g[unique_ch_object[subject, trial]];
+
+      Qmb_g[unique_ch_object[subject, trial]] = Qmb_g[unique_ch_object[subject, trial]]
+
+                                              + alpha_mb[subject]
+
+                                                * PE_mb_unique_g;
       
        
         }

@@ -11,7 +11,7 @@ modelfit_mcmc_loo <-function(path,mymcmc){
     load('./data/empirical_data/standata.Rdata')}
   if (mymcmc$datatype=='artificial'){print('using artificial data')
     current_model=set_data()
-    load(paste0(current_model,'/artificial_standata.Rdata'))}
+    load(paste0(current_model))}
 
   #sample
   like=

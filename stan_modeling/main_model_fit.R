@@ -17,18 +17,18 @@ modelfit_mcmc(
   
   mymcmc = list(
     datatype = 'empirical' ,
-    samples  = 100,
-    warmup  = 200,
+    samples  = 1000,
+    warmup  = 1000,
     chains  = 4,
     cores   = 4
   )
 )
 
 #####examine results--------------------
-mypars = c("population_scales[1]",
+mypars = c("population_scales_transformed[2]",
            "population_scales[2]")
 
-examine_mcmc(path, mypars, datatype = 'empirical')
+examine_mcmc(path, mypars, datatype = 'empirical',max_rows=30)
 
 examine_population_parameters_recovery(path, datatype = 'empirical')
 

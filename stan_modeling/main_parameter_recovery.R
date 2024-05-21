@@ -4,14 +4,21 @@ source('./functions/my_starter.R')
 
 path = set_workingmodel()
 
+load("functions/rndwlk1.rdata")
+load("functions/rndwlk2.rdata")
+load("functions/rndwlk3.rdata")
+load("functions/rndwlk4.rdata")
 cfg = list(
-  Nsubjects        = 100,
-  Nblocks          = 8,
-  Ntrials_perblock = 50,
+  Nsubjects        = 200,
+  Nblocks          = 2,
+  Ntrials_perblock = 200,
   Npersons         = 5, #number of arms in the task
   Nobjects         = 5, #number of arms offered for selection each trial
   Nraffle          = 2,
-  rndwlk           = read.csv('./functions/randomwalk_5_arms_200_trials.csv', header = F)
+  rndwlk1          = rndwlk1,
+  rndwlk2          = rndwlk2,
+  rndwlk3          = rndwlk3,
+  rndwlk4          = rndwlk4
 )
 
 
@@ -20,7 +27,7 @@ generate_artificial_data(cfg = cfg)
 load(paste0(path$data,'/artificial_data.Rdata'))
 #####sample posterior--------------------
 
-modelfit_compile(path, format = T)
+modelfit_compile(path, format = F)
 
 modelfit_mcmc(
   path,
@@ -29,9 +36,10 @@ modelfit_mcmc(
   mymcmc = list(
     datatype = 'artificial' ,
     samples  = 1000,
-    warmup  = 2000,
+    warmup  = 1000,
     chains  = 4,
-    cores   = 4
+    cores   = 4,
+    refresh = 10
   )
 )
 
@@ -43,9 +51,9 @@ mypars = c("population_locations[1]",
 
 examine_mcmc(path, mypars, datatype = 'artificial')
 
-examine_population_parameters_recovery(path, datatype = 'artificial',ncolumns = 3)
+examine_population_parameters_recovery(path, datatype = 'artificial',ncolumns = 4,format="beta")
 
-examine_individual_parameters_recovery(path,ncolumns=2)
+examine_individual_parameters_recovery(path,ncolumns=4)
 
 
 ####examine model

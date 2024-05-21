@@ -1,4 +1,4 @@
-examine_population_parameters_recovery <- function(path, datatype,ncolumns=1) {
+examine_population_parameters_recovery <- function(path, datatype,ncolumns=1,format) {
   library(ggplot2)
   library(bayestestR)
   library(stringr)
@@ -29,8 +29,10 @@ examine_population_parameters_recovery <- function(path, datatype,ncolumns=1) {
   source(paste0(path$model, '_parameters.r'))
   load(paste0(path$data, '/model_parameters.Rdata'))
   
-  Nparameters = length(model_parameters$artificial_population_location)
   p = list()
+  if(format!="beta"){
+  Nparameters = length(model_parameters$artificial_population_location)
+  
   for (i in 1:Nparameters) {
     samples    = fit$draws(variables = paste0('population_locations[', i, ']'),
                            format    = 'matrix')
@@ -74,9 +76,92 @@ examine_population_parameters_recovery <- function(path, datatype,ncolumns=1) {
       p[[i]] = p[[i]] + scale_x_continuous(limits = c(0, 1))
     } 
     else {
-      p[[i]] = p[[i]] + scale_x_continuous(limits = c(-1, 10))
+      p[[i]] = p[[i]] + scale_x_continuous(limits = c(-5, 5))
     } 
   }
-  
-  do.call("grid.arrange", c(p, ncol = ncolumns))
 }
+  else{
+      Nparameters = sum(model_parameters$transformation=="none")
+      Nparameters_transformed = sum(model_parameters$transformation!="none")
+      p = list()
+      for (i in 1:Nparameters) {
+        
+        samples    = fit$draws(variables = paste0('population_locations[', i, ']'),
+                               format    = 'matrix')
+        
+        if (datatype == 'artificial'){
+          sample_value = mean(model_parameters$artificial_individual_parameters[,i])
+          true_value=model_parameters$artificial_population_location[i]
+          
+        }
+        else{
+          true_value = NULL
+          sample_value=NULL
+        }
+        
+        samples    = data.frame(samples = unlist(samples))
+        
+        p[[i]] =
+          ggplot(data.frame(samples = as.numeric(unlist(samples))), aes(x = samples)) +
+          ggdist::stat_halfeye(
+            point_interval = 'median_hdi',
+            .width = c(0.89, 0.97),
+            fill = 'grey'
+          ) +   
+          geom_vline(xintercept = true_value, 
+                     linetype="dotted",
+                     color = "blue", 
+                     linewidth=1.5)+
+          geom_vline(xintercept = sample_value, 
+                     linetype="dotted",
+                     color = "lightblue", 
+                     linewidth=1.5)+
+          xlab(model_parameters$names[i]) +
+          mytheme +
+          
+          theme(axis.ticks.y = element_blank(),
+                axis.text.y = element_blank())
+        
+        p[[i]] = p[[i]] + scale_x_continuous(limits = c(-5, 5))
+      }
+      for (i in 1:Nparameters_transformed) {
+        samples    = fit$draws(variables = paste0('population_locations_transformed[', i, ']'),
+                               format    = 'matrix')
+        
+        if (datatype == 'artificial'){
+          sample_value = mean(model_parameters$artificial_individual_parameters[,i+Nparameters])
+          true_value=model_parameters$artificial_population_location[i+Nparameters]
+        }
+        else{
+          true_value = NULL
+          sample_value=NULL
+        }
+        
+        
+        p[[i+Nparameters]] =
+          ggplot(data.frame(samples = as.numeric(unlist(samples))), aes(x = samples)) +
+          ggdist::stat_halfeye(
+            point_interval = 'median_hdi',
+            .width = c(0.89, 0.97),
+            fill = 'grey'
+          ) +   
+          geom_vline(xintercept = true_value, 
+                     linetype="dotted",
+                     color = "blue", 
+                     linewidth=1.5)+
+          geom_vline(xintercept = sample_value, 
+                     linetype="dotted",
+                     color = "lightblue", 
+                     linewidth=1.5)+
+          xlab(model_parameters$names[i+Nparameters]) +
+          mytheme +
+          
+          theme(axis.ticks.y = element_blank(),
+                axis.text.y = element_blank())
+        p[[i+Nparameters]] = p[[i+Nparameters]] + scale_x_continuous(limits = c(0, 1))
+      } 
+      
+    }
+    do.call("grid.arrange", c(p, ncol = ncolumns))
+    
+  }

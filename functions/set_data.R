@@ -5,7 +5,7 @@ set_data<-function(){
   load('./functions/working_model.rdata')
   
   mymodel   =dlg_list(mymodels_list, multiple = F,title="Which simulated data are you using?")$res
-  data_path =paste0('./data/stanmodel_',mymodel)
+  data_path =paste0('./data/stan_ready_data_files/artificial_standata_',mymodel,'.Rdata')
   cat(paste0(mymodel,
              ' is the current data used',
              '\n',
