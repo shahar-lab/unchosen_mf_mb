@@ -8,9 +8,9 @@
 #          and also make sure your sd is not to high, since the transformation generates Inf when reaching one or zero
 
 model_parameters=list()
-model_parameters$names                             =c('c_mf','c_mf_unch',"c_mb",'c_mb_unch','pr','f_mf','f_mb','f_p')
+model_parameters$names                             =c('c_mf',"c_mb",'c_mf_unch','c_mb_unch','pr','f_mf','f_mb','f_p')
 model_parameters$transformation                    =c('none','none','none','none','none','beta','beta','beta')
-model_parameters$artificial_population_location    =c(0,0,0,0,0,0.5,0.5,0.5)
-model_parameters$artificial_population_scale       =c(1,1,1,1,1,0.2,0.2,0.2)
-# model_parameters$artificial_population_location    =c(0.47,-0.14,0.47,-0.14,0.13,0.31,0.31,0.06)
-# model_parameters$artificial_population_scale       =c(0.33,0.16,0.33,0.16,0.09,0.18,0.18,0.04)
+# model_parameters$artificial_population_location    =c(0,0,0,0,0,0.5,0.5,0.5)
+# model_parameters$artificial_population_scale       =c(1,1,1,1,1,0.2,0.2,0.2)
+model_parameters$artificial_population_location    =c(0.23,0.23,-0.1,-0.1,0.13,0.31,0.31,0.06)
+model_parameters$artificial_population_scale       =c(0.33,0.33,0.16,0.16,0.07,0.12,0.12,0.02)
