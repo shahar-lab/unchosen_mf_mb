@@ -22,12 +22,12 @@ examine_population_parameters_recovery <- function(path, datatype,ncolumns=1,for
   }
   else if (datatype == 'artificial') {
     print('using artificial data')
-    fit = readRDS(paste0(path$data, '/modelfit_recovery_none.rds'))
+    fit = readRDS(paste0(path$data, '/modelfit_recovery.rds'))
   }
   
   #load artificial parameters
   source(paste0(path$model, '_parameters.r'))
-  load(paste0(path$data, '/model_parameters_none.Rdata'))
+  load(paste0(path$data, '/model_parameters.Rdata'))
   
   p = list()
   if(format!="beta"){
