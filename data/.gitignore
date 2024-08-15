@@ -2,5 +2,5 @@
 *
   # Except this file
 !.gitignore
-!empirical_data
+!.empirical_data
 
