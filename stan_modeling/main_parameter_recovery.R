@@ -4,12 +4,13 @@ source('./functions/my_starter.R')
 
 path = set_workingmodel()
 
+
 load("functions/rndwlk1.rdata")
 load("functions/rndwlk2.rdata")
 load("functions/rndwlk3.rdata")
 load("functions/rndwlk4.rdata")
 cfg = list(
-  Nsubjects        = 200,
+  Nsubjects        = 500,
   Nblocks          = 2,
   Ntrials_perblock = 200,
   Npersons         = 5, #number of arms in the task
@@ -51,14 +52,15 @@ mypars = c("population_locations[1]",
 
 examine_mcmc(path, mypars, datatype = 'artificial')
 
-examine_population_parameters_recovery(path, datatype = 'artificial',ncolumns = 4,format="beta")
+examine_population_parameters_recovery(path, datatype = 'artificial',ncolumns = 2,format="beta")
 
 examine_individual_parameters_recovery(path,ncolumns=4)
 
 
 ####examine model
 #load parameters
-fit   = readRDS(paste0(path$data, '/modelfit_recovery.rds'))
+fit   = readRDS(paste0(path$data, '/modelfit_recovery_200.rds'))
+fit   = readRDS(paste0(path$data, '/modelfit_empirical.rds'))
 Qdiff = fit$draws(variables = 'Qdiff_external', format = 'draws_matrix')
 Qval1 = fit$draws(variables = 'Qval1_external', format = 'draws_matrix')
 Qval2 = fit$draws(variables = 'Qval2_external', format = 'draws_matrix')

@@ -6,7 +6,7 @@ examine_mcmc <- function(path, mypars, datatype) {
   }
   else if (datatype == 'artificial') {
     print('using artificial data, please wait a bit. Do not use results having rhat>=1.01')
-    fit = readRDS(paste0(path$data, '/modelfit_recovery.rds'))
+    fit = readRDS(paste0(path$data, '/modelfit_recovery_200.rds'))
   }
   p = list()
   for (i in seq_along(mypars)) {
