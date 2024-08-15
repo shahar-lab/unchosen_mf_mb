@@ -3,4 +3,4 @@
   # Except this file
 !.gitignore
 !empirical_data
-git rm -r --cached empirical_data
+
