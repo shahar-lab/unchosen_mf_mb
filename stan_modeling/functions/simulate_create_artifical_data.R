@@ -2,7 +2,7 @@
 simulate_artifical_data <-function(path,cfg){
 
   #load parameters
-  load(paste0(path$data,'/model_parameters.Rdata'))
+  load(paste0(path$data,'/simulate_empirical/model_parameters.Rdata'))
 
   #set sample size
   Nsubjects =dim(model_parameters$artificial_individual_parameters)[1] 
@@ -32,7 +32,7 @@ simulate_artifical_data <-function(path,cfg){
               cfg=cfg)
     }
   
-  data_path = paste0(path$data,'/artificial_data.Rdata')
+  data_path = paste0(path$data,'/simulate_empirical/artificial_data.Rdata')
 
   #save
   save(df,file=data_path)

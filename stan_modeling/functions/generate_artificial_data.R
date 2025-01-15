@@ -12,7 +12,7 @@ generate_artificial_data <- function(cfg) {
   
   # convert to format that stan likes
   simulate_convert_to_standata(path,cfg,
-                               
+
                                var_toinclude  = c(
                                  'first_trial_in_block',
                                  'trial',
@@ -20,9 +20,9 @@ generate_artificial_data <- function(cfg) {
                                  'person2',
                                  'ch_person',
                                  'unch_person',
-                                 'common_object',
-                                 'unique_ch_object',
-                                 'unique_unch_object',
+                                 'common_product',
+                                 'unique_ch_product',
+                                 'unique_unch_product',
                                  'common_reward',
                                  'unique_reward',
                                  'selected_offer',

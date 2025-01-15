@@ -1,8 +1,9 @@
 misc/
-.rds
+.RData
 # History files
 .Rhistory
 .Rapp.history
+/data
 # Session Data files
 
 

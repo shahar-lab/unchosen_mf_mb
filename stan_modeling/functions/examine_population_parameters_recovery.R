@@ -56,24 +56,27 @@ examine_population_parameters_recovery <- function(path, datatype,ncolumns=1,for
       ggplot(data.frame(samples = as.numeric(unlist(samples))), aes(x = samples)) +
       ggdist::stat_halfeye(
         point_interval = 'median_hdi',
-        .width = c(0.95),
+        .width = c(0.89, 0.97),
         fill = 'grey'
       ) +   
+      geom_vline(xintercept = true_value, 
+                       linetype="dotted",
+                       color = "blue", 
+                       linewidth=1.5)+
       geom_vline(xintercept = sample_value, 
                  linetype="dotted",
-                 color = "blue", 
+                 color = "lightblue", 
                  linewidth=1.5)+
       xlab(model_parameters$names[i]) +
       mytheme +
       
       theme(axis.ticks.y = element_blank(),
-            axis.text.y = element_blank(),
-            axis.title.y = element_blank())
+            axis.text.y = element_blank())
     if (model_parameters$transformation[i] == "logit") {
       p[[i]] = p[[i]] + scale_x_continuous(limits = c(0, 1))
     } 
     else {
-      p[[i]] = p[[i]] + scale_x_continuous(limits = c(-0.3, 0.3))
+      p[[i]] = p[[i]] + scale_x_continuous(limits = c(-5, 5))
     } 
   }
 }
@@ -102,21 +105,24 @@ examine_population_parameters_recovery <- function(path, datatype,ncolumns=1,for
           ggplot(data.frame(samples = as.numeric(unlist(samples))), aes(x = samples)) +
           ggdist::stat_halfeye(
             point_interval = 'median_hdi',
-            .width = c(0.95),
+            .width = c(0.89, 0.97),
             fill = 'grey'
           ) +   
-          geom_vline(xintercept = sample_value, 
+          geom_vline(xintercept = true_value, 
                      linetype="dotted",
                      color = "blue", 
+                     linewidth=1.5)+
+          geom_vline(xintercept = sample_value, 
+                     linetype="dotted",
+                     color = "lightblue", 
                      linewidth=1.5)+
           xlab(model_parameters$names[i]) +
           mytheme +
           
           theme(axis.ticks.y = element_blank(),
-                axis.text.y = element_blank(),
-                axis.title.y = element_blank())
+                axis.text.y = element_blank())
         
-        p[[i]] = p[[i]] + scale_x_continuous(limits = c(-0.3, 0.3))
+        p[[i]] = p[[i]] + scale_x_continuous(limits = c(-5, 5))
       }
       for (i in 1:Nparameters_transformed) {
         samples    = fit$draws(variables = paste0('population_locations_transformed[', i, ']'),
@@ -136,23 +142,26 @@ examine_population_parameters_recovery <- function(path, datatype,ncolumns=1,for
           ggplot(data.frame(samples = as.numeric(unlist(samples))), aes(x = samples)) +
           ggdist::stat_halfeye(
             point_interval = 'median_hdi',
-            .width = c(0.95),
+            .width = c(0.89, 0.97),
             fill = 'grey'
           ) +   
-          geom_vline(xintercept = sample_value, 
+          geom_vline(xintercept = true_value, 
                      linetype="dotted",
                      color = "blue", 
+                     linewidth=1.5)+
+          geom_vline(xintercept = sample_value, 
+                     linetype="dotted",
+                     color = "lightblue", 
                      linewidth=1.5)+
           xlab(model_parameters$names[i+Nparameters]) +
           mytheme +
           
           theme(axis.ticks.y = element_blank(),
-                axis.text.y = element_blank(),
-                axis.title.y = element_blank())
+                axis.text.y = element_blank())
         p[[i+Nparameters]] = p[[i+Nparameters]] + scale_x_continuous(limits = c(0, 1))
       } 
       
     }
-  do.call("grid.arrange", c(c(p[3],p[4]), ncol = ncolumns))
+    do.call("grid.arrange", c(p, ncol = ncolumns))
     
   }

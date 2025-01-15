@@ -15,7 +15,9 @@ modelfit_mcmc <-function(path, data_path, mymcmc){
     iter_warmup     = mymcmc$warmup,
     chains          = mymcmc$chains,
     parallel_chains = mymcmc$cores,
-    refresh         = mymcmc$refresh)  
+    refresh         = mymcmc$refresh,
+    adapt_delta = 0.95,  # Reduce divergences
+    max_treedepth = 15 )   # Allow deeper exploration 
 
 
   #save

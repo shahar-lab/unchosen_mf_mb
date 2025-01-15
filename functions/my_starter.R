@@ -24,6 +24,7 @@ library(lme4)
 library(RLR)
 
 source('./stan_modeling/functions/simulate_parameters.R')
+source('./stan_modeling/functions/empirical_convert_to_stan_format.R')
 source('./stan_modeling/functions/simulate_create_artifical_data.R')
 source('./stan_modeling/functions/simulate_convert_to_stan_format.R')
 source('./stan_modeling/functions/modelfit_compile.R')

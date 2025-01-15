@@ -17,6 +17,6 @@ simulate_parameters <-function(path,cfg,plotme){
   }
 
   #save
-  save(model_parameters,file=paste0(path$data,'/model_parameters.Rdata'))
+  save(model_parameters,file=paste0(path$data,'/simulate_empirical/model_parameters.Rdata'))
   cat(paste0('[stan_modeling]:  "model_parameters.Rdata" was saved at "',path$data,'"'))
 }
