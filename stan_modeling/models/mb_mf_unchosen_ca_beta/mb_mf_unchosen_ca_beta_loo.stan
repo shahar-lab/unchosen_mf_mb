@@ -24,7 +24,7 @@ data {
 
   
 
-  int<lower=2> Nobjects;
+  int<lower=2> Nproducts;
 
   
 
@@ -45,15 +45,15 @@ data {
 
   
 
-  array[Nsubjects, Ntrials] int<lower=0> common_object;
+  array[Nsubjects, Ntrials] int<lower=0> common_product;
 
   
 
-  array[Nsubjects, Ntrials] int<lower=0> unique_ch_object;
+  array[Nsubjects, Ntrials] int<lower=0> unique_ch_product;
 
   
 
-  array[Nsubjects, Ntrials] int<lower=0> unique_unch_object;
+  array[Nsubjects, Ntrials] int<lower=0> unique_unch_product;
 
   
 
@@ -130,7 +130,7 @@ transformed parameters {
   
   vector[Npersons] pers;
 
-  vector[Nobjects] Qmb;
+  vector[Nproducts] Qmb;
 
   matrix[Ntrials, Nsubjects] Qnet_diff;
 
@@ -146,7 +146,7 @@ for (subject in 1 : Nsubjects) {
 
         pers = rep_vector(0,Npersons);
 
-        Qmb = rep_vector(0, Nobjects);
+        Qmb = rep_vector(0, Nproducts);
 
       }
 
@@ -154,25 +154,25 @@ for (subject in 1 : Nsubjects) {
 
       if (ch_person[subject, trial] == person1[subject, trial]) {
 
-        Qmb_offered[1] = Qmb[common_object[subject, trial]]
+        Qmb_offered[1] = Qmb[common_product[subject, trial]]
 
-                         + Qmb[unique_ch_object[subject, trial]];
+                         + Qmb[unique_ch_product[subject, trial]];
 
-        Qmb_offered[2] = Qmb[common_object[subject, trial]]
+        Qmb_offered[2] = Qmb[common_product[subject, trial]]
 
-                         + Qmb[unique_unch_object[subject, trial]];
+                         + Qmb[unique_unch_product[subject, trial]];
 
       } else {
 
-        Qmb_offered[1] = Qmb[common_object[subject, trial]]
+        Qmb_offered[1] = Qmb[common_product[subject, trial]]
 
-                         + Qmb[unique_unch_object[subject, trial]];
+                         + Qmb[unique_unch_product[subject, trial]];
 
         
 
-        Qmb_offered[2] = Qmb[common_object[subject, trial]]
+        Qmb_offered[2] = Qmb[common_product[subject, trial]]
 
-                         + Qmb[unique_ch_object[subject, trial]];
+                         + Qmb[unique_ch_product[subject, trial]];
 
       }
 
@@ -202,16 +202,16 @@ for (subject in 1 : Nsubjects) {
 
       //Qmb, forgetting and then updating
       Qmb = (1-f_mb[subject])*Qmb;
-      Qmb[common_object[subject, trial]] = Qmb[common_object[subject, trial]]
+      Qmb[common_product[subject, trial]] = Qmb[common_product[subject, trial]]
 
                                            +c_mb[subject] * common_reward[subject, trial];
 
-      Qmb[unique_ch_object[subject, trial]] = Qmb[unique_ch_object[subject, trial]]
+      Qmb[unique_ch_product[subject, trial]] = Qmb[unique_ch_product[subject, trial]]
 
                                            +c_mb[subject] * unique_reward[subject, trial];
 
 
-      Qmb[unique_unch_object[subject, trial]] = Qmb[unique_unch_object[subject, trial]]
+      Qmb[unique_unch_product[subject, trial]] = Qmb[unique_unch_product[subject, trial]]
 
                                                 + c_mb_unch[subject]* unique_reward[subject, trial];
       //perseveration, forgetting and then updating
@@ -275,7 +275,7 @@ generated quantities {
   
   vector[Npersons] Qmf_g;
   vector[Npersons] pers_g;
-  vector[Nobjects] Qmb_g;
+  vector[Nproducts] Qmb_g;
   matrix[Ntrials, Nsubjects] Qnet_diff_g;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Likelihood function per subject per trial
@@ -292,27 +292,27 @@ log_lik=rep_matrix(0,Ntrials,Nsubjects);
         
         pers_g = rep_vector(0, Npersons);
 
-        Qmb_g = rep_vector(0, Nobjects);
+        Qmb_g = rep_vector(0, Nproducts);
       }
         if (ch_person[subject, trial] == person1[subject, trial]) {
 
-        Qmb_offered_g[1] = Qmb_g[common_object[subject, trial]]
+        Qmb_offered_g[1] = Qmb_g[common_product[subject, trial]]
 
-                         + Qmb_g[unique_ch_object[subject, trial]];
+                         + Qmb_g[unique_ch_product[subject, trial]];
 
-        Qmb_offered_g[2] = Qmb_g[common_object[subject, trial]]
+        Qmb_offered_g[2] = Qmb_g[common_product[subject, trial]]
 
-                         + Qmb_g[unique_unch_object[subject, trial]];
+                         + Qmb_g[unique_unch_product[subject, trial]];
 
       } else {
 
-        Qmb_offered_g[1] = Qmb_g[common_object[subject, trial]]
+        Qmb_offered_g[1] = Qmb_g[common_product[subject, trial]]
 
-                         + Qmb_g[unique_unch_object[subject, trial]];
+                         + Qmb_g[unique_unch_product[subject, trial]];
 
-        Qmb_offered_g[2] = Qmb_g[common_object[subject, trial]]
+        Qmb_offered_g[2] = Qmb_g[common_product[subject, trial]]
 
-                         + Qmb_g[unique_ch_object[subject, trial]];
+                         + Qmb_g[unique_ch_product[subject, trial]];
 
       }
       
@@ -344,16 +344,16 @@ log_lik=rep_matrix(0,Ntrials,Nsubjects);
      
       //Qmb, forgetting and then updating
       Qmb_g = (1-f_mb[subject])*Qmb_g;
-      Qmb_g[common_object[subject, trial]] = Qmb_g[common_object[subject, trial]]
+      Qmb_g[common_product[subject, trial]] = Qmb_g[common_product[subject, trial]]
 
                                            +c_mb[subject] * common_reward[subject, trial];
 
-      Qmb_g[unique_ch_object[subject, trial]] = Qmb_g[unique_ch_object[subject, trial]]
+      Qmb_g[unique_ch_product[subject, trial]] = Qmb_g[unique_ch_product[subject, trial]]
 
                                            +c_mb[subject] * unique_reward[subject, trial];
 
 
-      Qmb_g[unique_unch_object[subject, trial]] = Qmb_g[unique_unch_object[subject, trial]]
+      Qmb_g[unique_unch_product[subject, trial]] = Qmb_g[unique_unch_product[subject, trial]]
 
                                                 + c_mb_unch[subject]* unique_reward[subject, trial];
       
